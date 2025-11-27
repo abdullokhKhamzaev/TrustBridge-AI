@@ -133,6 +133,7 @@ export const useAuth = () => {
 
   /**
    * Login with GitHub OAuth
+   * Requests 'repo' scope to access user's repositories
    */
   const loginWithGitHub = async () => {
     loading.value = true
@@ -142,7 +143,8 @@ export const useAuth = () => {
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${config.public.siteUrl || window.location.origin}/auth/callback`
+          redirectTo: `${config.public.siteUrl || window.location.origin}/auth/callback`,
+          scopes: 'repo read:user'
         }
       })
 

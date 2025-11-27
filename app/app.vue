@@ -26,6 +26,13 @@ useSeoMeta({
 const user = useSupabaseUser()
 const { signOut, loading } = useAuth()
 
+// Color mode
+const colorMode = useColorMode()
+const isDark = computed({
+  get: () => colorMode.value === 'dark',
+  set: () => colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+})
+
 const navLinks = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' }
@@ -74,6 +81,15 @@ const authNavLinks = [
 
         <!-- Actions -->
         <div class="flex items-center gap-2">
+          <!-- Dark mode toggle -->
+          <UButton
+            :icon="isDark ? 'i-lucide-sun' : 'i-lucide-moon'"
+            variant="ghost"
+            size="sm"
+            aria-label="Toggle color mode"
+            @click="isDark = !isDark"
+          />
+
           <!-- Not logged in -->
           <template v-if="!user">
             <UButton to="/auth/login" variant="ghost" size="sm">
@@ -83,20 +99,21 @@ const authNavLinks = [
               Get Started
             </UButton>
           </template>
-          
+
           <!-- Logged in -->
           <template v-else>
-            <span class="text-sm text-muted hidden sm:inline">
-              {{ user.email }}
-            </span>
-            <UButton 
-              variant="ghost" 
-              size="sm"
-              :loading="loading"
-              @click="signOut"
+            <UDropdownMenu
+              :items="[
+                [{ label: user.email, disabled: true }],
+                [{ label: 'Sign Out', icon: 'i-heroicons-arrow-right-on-rectangle', onSelect: () => signOut() }]
+              ]"
             >
-              Sign Out
-            </UButton>
+              <UButton
+                icon="i-heroicons-user-circle"
+                variant="ghost"
+                size="sm"
+              />
+            </UDropdownMenu>
           </template>
         </div>
       </div>

@@ -1,5 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: false, // SPA mode - no SSR needed for dashboard app
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
