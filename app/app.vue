@@ -1,0 +1,131 @@
+<script setup lang="ts">
+useHead({
+  meta: [
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+  ],
+  link: [
+    { rel: 'icon', href: '/favicon.ico' }
+  ],
+  htmlAttrs: {
+    lang: 'en'
+  }
+})
+
+const title = 'DevProfile AI'
+const description = 'AI-Powered Developer Portfolio & Matching Platform. Showcase your real skills through AI-powered GitHub repository analysis.'
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+  twitterCard: 'summary_large_image'
+})
+
+// Auth state
+const user = useSupabaseUser()
+const { signOut, loading } = useAuth()
+
+const navLinks = [
+  { label: 'Home', to: '/' },
+  { label: 'About', to: '/about' }
+]
+
+const authNavLinks = [
+  { label: 'Dashboard', to: '/developer' },
+  { label: 'Repositories', to: '/developer/repositories' },
+  { label: 'Resume', to: '/developer/resume' }
+]
+</script>
+
+<template>
+  <div class="min-h-screen bg-default">
+    <!-- Header -->
+    <header class="border-b border-default sticky top-0 bg-default/80 backdrop-blur-sm z-50">
+      <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+        <!-- Logo -->
+        <NuxtLink to="/" class="flex items-center gap-2">
+          <UIcon name="i-lucide-code-2" class="w-8 h-8 text-primary" />
+          <span class="font-bold text-xl">DevProfile AI</span>
+        </NuxtLink>
+
+        <!-- Navigation -->
+        <nav class="hidden md:flex items-center gap-6">
+          <NuxtLink
+            v-for="link in navLinks"
+            :key="link.to"
+            :to="link.to"
+            class="text-sm font-medium text-muted hover:text-default transition-colors"
+          >
+            {{ link.label }}
+          </NuxtLink>
+          <!-- Auth nav links (only when logged in) -->
+          <template v-if="user">
+            <NuxtLink
+              v-for="link in authNavLinks"
+              :key="link.to"
+              :to="link.to"
+              class="text-sm font-medium text-muted hover:text-default transition-colors"
+            >
+              {{ link.label }}
+            </NuxtLink>
+          </template>
+        </nav>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2">
+          <!-- Not logged in -->
+          <template v-if="!user">
+            <UButton to="/auth/login" variant="ghost" size="sm">
+              Sign In
+            </UButton>
+            <UButton to="/auth/login" size="sm">
+              Get Started
+            </UButton>
+          </template>
+          
+          <!-- Logged in -->
+          <template v-else>
+            <span class="text-sm text-muted hidden sm:inline">
+              {{ user.email }}
+            </span>
+            <UButton 
+              variant="ghost" 
+              size="sm"
+              :loading="loading"
+              @click="signOut"
+            >
+              Sign Out
+            </UButton>
+          </template>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-h-[calc(100vh-8rem)]">
+      <NuxtPage />
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-default py-8">
+      <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <UIcon name="i-lucide-code-2" class="w-5 h-5 text-primary" />
+          <span class="font-semibold">DevProfile AI</span>
+          <span class="text-sm text-muted">• © {{ new Date().getFullYear() }}</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <UButton
+            to="https://github.com"
+            target="_blank"
+            icon="i-simple-icons-github"
+            aria-label="GitHub"
+            variant="ghost"
+            size="sm"
+          />
+        </div>
+      </div>
+    </footer>
+  </div>
+</template>
