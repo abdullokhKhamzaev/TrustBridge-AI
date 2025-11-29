@@ -18,10 +18,24 @@ export const useGitHub = () => {
 
   /**
    * Check if user is connected to GitHub
+   * First checks for active token, then falls back to checking profile
    */
   const isGitHubConnected = async (): Promise<boolean> => {
+    // First try token (for fresh sessions)
     const token = await getToken()
-    return !!token
+    if (token) return true
+    
+    // Fallback: check if user has github_username in profile
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+    
+    const { data: profile } = await supabase
+      .from('developer_profiles')
+      .select('github_username')
+      .eq('user_id', user.id)
+      .single()
+    
+    return !!profile?.github_username
   }
 
   /**

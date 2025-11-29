@@ -17,6 +17,10 @@ const importing = ref<number | null>(null)
 const loadingGithub = ref(false)
 const modalOpen = ref(false)
 
+// Analysis modal state
+const analysisModalOpen = ref(false)
+const selectedRepo = ref<GitHubRepository | null>(null)
+
 // Check GitHub connection and load data
 onMounted(async () => {
   isConnected.value = await github.isGitHubConnected()
@@ -48,6 +52,19 @@ async function handleRemove(repo: GitHubRepository) {
   }
 }
 
+// Open analysis modal
+async function openAnalysisModal(repo: GitHubRepository) {
+  selectedRepo.value = repo
+  await nextTick()
+  analysisModalOpen.value = true
+}
+
+// Handle analysis complete
+function handleAnalysisComplete() {
+  repos.fetchRepositories()
+  analysisModalOpen.value = false
+}
+
 // Filter GitHub repos
 const filteredGithubRepos = computed(() => {
   if (!searchQuery.value) return githubRepos.value
@@ -57,13 +74,26 @@ const filteredGithubRepos = computed(() => {
   )
 })
 
-function getStatusColor(status: string) {
-  const colors: Record<string, string> = {
+function getStatusColor(status: string): 'success' | 'warning' | 'error' | 'neutral' | 'primary' | 'secondary' | 'info' {
+  const colors: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'primary' | 'secondary' | 'info'> = {
     completed: 'success',
-    analyzing: 'warning',
-    failed: 'error'
+    processing: 'warning',
+    failed: 'error',
+    pending: 'neutral',
+    not_analyzed: 'neutral'
   }
   return colors[status] || 'neutral'
+}
+
+function getStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    completed: 'Analyzed',
+    processing: 'Analyzing...',
+    failed: 'Failed',
+    pending: 'Pending',
+    not_analyzed: 'Not Analyzed'
+  }
+  return labels[status] || status
 }
 </script>
 
@@ -183,9 +213,12 @@ function getStatusColor(status: string) {
                 {{ repo.repo_name }}
               </a>
               <span v-if="repo.is_private" class="text-xs px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded">Private</span>
-              <UBadge :color="getStatusColor(repo.analysis_status)" variant="subtle" size="xs">
-                {{ repo.analysis_status.replace('_', ' ') }}
+              <UBadge :color="getStatusColor(repo.analysis_status || 'not_analyzed')" variant="subtle" size="xs">
+                {{ getStatusLabel(repo.analysis_status || 'not_analyzed') }}
               </UBadge>
+              <span v-if="repo.analysis_status === 'completed' && repo.updated_at" class="text-xs text-gray-400">
+                {{ new Date(repo.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }}, {{ new Date(repo.updated_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false }) }}
+              </span>
             </div>
             <p v-if="repo.description" class="text-gray-500 text-sm mb-3">{{ repo.description }}</p>
             <div class="flex items-center gap-4 text-sm text-gray-400">
@@ -205,19 +238,39 @@ function getStatusColor(status: string) {
           </div>
           <div class="flex items-center gap-2">
             <UButton
-              v-if="repo.analysis_status === 'not_analyzed'"
+              v-if="!repo.analysis_status || repo.analysis_status === 'not_analyzed' || repo.analysis_status === 'pending' || repo.analysis_status === 'failed'"
               color="primary"
               size="sm"
+              @click="openAnalysisModal(repo)"
             >
+              <UIcon name="i-lucide-sparkles" class="w-4 h-4 mr-1" />
               Analyze
             </UButton>
             <UButton
-              v-else-if="repo.analysis_status === 'completed'"
+              v-else-if="repo.analysis_status === 'processing'"
               variant="outline"
               size="sm"
+              disabled
             >
-              View Results
+              <UIcon name="i-lucide-loader-2" class="w-4 h-4 mr-1 animate-spin" />
+              Analyzing...
             </UButton>
+            <template v-else-if="repo.analysis_status === 'completed'">
+              <NuxtLink :to="`/developer/repositories/${repo.id}`">
+                <UButton variant="outline" size="sm">
+                  <UIcon name="i-lucide-eye" class="w-4 h-4 mr-1" />
+                  View
+                </UButton>
+              </NuxtLink>
+              <UButton
+                variant="ghost"
+                size="sm"
+                @click="openAnalysisModal(repo)"
+              >
+                <UIcon name="i-lucide-refresh-cw" class="w-4 h-4 mr-1" />
+                Re-analyze
+              </UButton>
+            </template>
             <UButton
               variant="ghost"
               color="error"
@@ -229,5 +282,16 @@ function getStatusColor(status: string) {
         </div>
       </div>
     </div>
+    
+    <!-- Analysis Modal -->
+    <AnalysisModal
+      v-if="selectedRepo"
+      v-model:open="analysisModalOpen"
+      :repository-id="selectedRepo.id"
+      :repo-url="selectedRepo.repo_url"
+      :repo-name="selectedRepo.repo_name || 'Repository'"
+      :github-username="selectedRepo.owner_username"
+      @analysis-complete="handleAnalysisComplete"
+    />
   </div>
 </template>

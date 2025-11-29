@@ -89,8 +89,9 @@ CREATE TABLE github_repositories (
   
   -- Analysis
   analysis_status TEXT DEFAULT 'not_analyzed' CHECK (analysis_status IN (
-    'not_analyzed', 'pending', 'analyzing', 'completed', 'failed'
+    'not_analyzed', 'pending', 'processing', 'completed', 'failed'
   )),
+  error_message TEXT,
   
   -- Timestamps
   repo_created_at TIMESTAMPTZ,
@@ -159,23 +160,8 @@ CREATE TABLE project_analyses (
   last_commit_date TIMESTAMPTZ,
   project_duration_days INTEGER,
   
-  -- AI Analysis Data (JSONB)
+  -- AI Analysis Data (JSONB) - see server/schemas/projectAnalysisSchemas.ts for structure
   analysis_data JSONB,
-  /*
-  {
-    "project_overview": "...",
-    "key_achievements": [...],
-    "technical_highlights": {
-      "frameworks": [...],
-      "libraries": [...],
-      "patterns": [...]
-    },
-    "code_quality": {...},
-    "resume_points": [...],
-    "notable_patterns": [...],
-    "interview_topics": [...]
-  }
-  */
   
   -- Resume-ready content
   resume_bullets JSONB,

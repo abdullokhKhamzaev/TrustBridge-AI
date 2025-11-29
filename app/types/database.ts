@@ -46,7 +46,7 @@ export interface GitHubRepository {
   updated_at: string
 }
 
-export type AnalysisStatus = 'not_analyzed' | 'pending' | 'analyzing' | 'completed' | 'failed'
+export type AnalysisStatus = 'not_analyzed' | 'pending' | 'processing' | 'completed' | 'failed'
 
 export type ProjectScale = 'micro' | 'small' | 'medium' | 'large' | 'enterprise'
 
