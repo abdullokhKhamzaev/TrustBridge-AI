@@ -55,12 +55,12 @@ export default defineEventHandler(async (event) => {
     // Estimate tokens based on repository data
     const baseTokens = 2000 // Base prompt + schema
     const commitTokens = Math.min(repoData.gitStats.total_commits * 10, 2000)
-    const packageJsonTokens = repoData.packageJson ? 500 : 0
+    const configTokens = Object.keys(repoData.configFiles).length * 300
     const readmeTokens = repoData.readme ? Math.min(repoData.readme.length / 4, 1000) : 0
     const fileStructureTokens = Math.min(repoData.fileStructure.length * 5, 500)
     const outputTokens = 2000 // Estimated output
 
-    const estimatedInputTokens = baseTokens + commitTokens + packageJsonTokens + readmeTokens + fileStructureTokens
+    const estimatedInputTokens = baseTokens + commitTokens + configTokens + readmeTokens + fileStructureTokens
     const estimatedTotalTokens = estimatedInputTokens + outputTokens
 
     // Calculate credits (1 credit = 1000 tokens)
@@ -73,6 +73,9 @@ export default defineEventHandler(async (event) => {
     else if (commits > 150) projectScale = 'large'
     else if (commits > 50) projectScale = 'medium'
     else if (commits > 10) projectScale = 'small'
+
+    // Detect config files found
+    const configFilesFound = Object.keys(repoData.configFiles)
 
     return {
       success: true,
@@ -91,7 +94,7 @@ export default defineEventHandler(async (event) => {
         project_scale: projectScale,
         total_commits: repoData.gitStats.total_commits,
         project_duration_days: repoData.gitStats.project_duration_days,
-        has_package_json: !!repoData.packageJson,
+        config_files: configFilesFound,
         has_readme: !!repoData.readme,
         file_count: repoData.fileStructure.length,
         languages: Object.keys(repoData.gitStats.languages || {}).slice(0, 5),

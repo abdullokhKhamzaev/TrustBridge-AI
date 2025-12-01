@@ -36,10 +36,14 @@ Analyzing contributions of **SPECIFIC USER** in git stats.
 ✅ "Factory management system digitizing production from raw materials to sales, with 6-stage workflow tracking, inventory, payroll, and reporting"
 
 ### Achievements
-BUSINESS VALUE with verifiable details:
+Extract ALL significant features from the codebase. Be thorough - analyze every module, component, and functionality.
+
+Focus on BUSINESS VALUE with verifiable details:
 
 ❌ `{"title": "Dashboard", "description": "Built responsive dashboard with Vue.js"}`
 ✅ `{"title": "6-Stage Production Tracking", "description": "Tracks weaving→cutting→embroidery→sewing→painting→packaging with materials, workers, output per stage"}`
+
+**Important:** Only include features that actually exist in the code. Never fabricate.
 
 ### Resume Points (X-Y-Z Formula)
 **"Accomplished [X] as measured by [Y], by doing [Z]"**

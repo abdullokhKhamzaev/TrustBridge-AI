@@ -5,6 +5,25 @@ const username = route.params.username as string
 // View mode: hr, tech, full
 const viewMode = ref<'hr' | 'tech' | 'full'>('full')
 
+// Track expanded categories for "Show more"
+const expandedCategories = ref<Set<string>>(new Set())
+
+function toggleCategory(category: string) {
+  if (expandedCategories.value.has(category)) {
+    expandedCategories.value.delete(category)
+  } else {
+    expandedCategories.value.add(category)
+  }
+}
+
+function isExpanded(category: string) {
+  return expandedCategories.value.has(category)
+}
+
+function getVisibleAchievements(achievements: any[], category: string) {
+  return isExpanded(category) ? achievements : achievements.slice(0, 5)
+}
+
 // Fetch profile data
 const { data, pending, error } = await useFetch(`/api/profile/${username}`, {
   query: { view: viewMode }
@@ -319,7 +338,7 @@ function formatDuration(days: number): string {
                   </h3>
                   
                   <div 
-                    v-for="(achievement, idx) in achievements.slice(0, 5)" 
+                    v-for="(achievement, idx) in getVisibleAchievements(achievements, category as string)" 
                     :key="idx"
                     class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                   >
@@ -348,12 +367,20 @@ function formatDuration(days: number): string {
                     </div>
                   </div>
                   
-                  <!-- Show more -->
+                  <!-- Show more / Show less -->
                   <button 
                     v-if="achievements.length > 5" 
-                    class="text-sm text-primary hover:underline"
+                    @click="toggleCategory(category as string)"
+                    class="text-sm text-primary hover:underline flex items-center gap-1"
                   >
-                    Show {{ achievements.length - 5 }} more...
+                    <template v-if="!isExpanded(category as string)">
+                      <UIcon name="i-lucide-chevron-down" class="w-4 h-4" />
+                      Show {{ achievements.length - 5 }} more
+                    </template>
+                    <template v-else>
+                      <UIcon name="i-lucide-chevron-up" class="w-4 h-4" />
+                      Show less
+                    </template>
                   </button>
                 </div>
               </template>

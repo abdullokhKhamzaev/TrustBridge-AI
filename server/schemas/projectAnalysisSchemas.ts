@@ -5,27 +5,14 @@ import { z } from 'zod'
  * Defines the structure of LLM output for GitHub repository analysis
  */
 
-// Project scale classification
-export const projectScaleSchema = z.enum([
-  'micro',      // 1-10 commits, <1 week
-  'small',      // 11-50 commits, 1 week - 2 months
-  'medium',     // 51-150 commits, 2-6 months
-  'large',      // 151-500 commits, 6-12 months
-  'enterprise'  // 500+ commits, 12+ months
-])
+// Project scale classification - flexible string to accept any scale from LLM
+export const projectScaleSchema = z.string().describe('Project scale: micro, small, medium, large, or enterprise')
 
 // Achievement schema
 export const achievementSchema = z.object({
   title: z.string().describe('Brief achievement title'),
   description: z.string().describe('Detailed description of the achievement'),
-  category: z.enum([
-    'feature',
-    'integration',
-    'performance',
-    'architecture',
-    'quality',
-    'business_impact'
-  ]).describe('Achievement category'),
+  category: z.string().describe('Achievement category'),
   metrics: z.string().optional().describe('Quantifiable metrics if available')
 })
 
@@ -103,8 +90,6 @@ export const projectAnalysisDataSchema = z.object({
   project_overview: z.string().describe('2-4 sentence project description'),
   
   key_achievements: z.array(achievementSchema)
-    .min(2)
-    .max(15)
     .describe('Scale-appropriate achievements list'),
   
   technical_highlights: technicalHighlightSchema.describe('Technical stack and patterns'),
@@ -112,8 +97,6 @@ export const projectAnalysisDataSchema = z.object({
   code_quality: codeQualitySchema.optional().describe('Code quality assessment (Medium+ projects)'),
   
   resume_points: z.array(z.string())
-    .min(2)
-    .max(10)
     .describe('HR-friendly bullet points for resume'),
   
   notable_patterns: z.array(z.string())

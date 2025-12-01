@@ -116,7 +116,7 @@ export default defineEventHandler(async (event) => {
       const analysisResult = await llmService.analyzeRepository(
         repoData.repoName,
         repoData.gitStats,
-        repoData.packageJson || undefined,
+        repoData.configFiles,
         repoData.readme || undefined,
         repoData.fileStructure
       )

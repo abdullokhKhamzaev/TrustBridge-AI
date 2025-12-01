@@ -83,7 +83,7 @@ export class ProjectAnalysisLLMService {
   async analyzeRepository(
     repoName: string,
     gitStats: GitStats,
-    packageJson?: Record<string, any>,
+    configFiles?: Record<string, string>,
     readmeContent?: string,
     fileStructure?: string[],
     options: {
@@ -103,7 +103,7 @@ export class ProjectAnalysisLLMService {
       const analysisContext = this.buildAnalysisContext(
         repoName,
         gitStats,
-        packageJson,
+        configFiles,
         readmeContent,
         fileStructure
       )
@@ -151,7 +151,7 @@ export class ProjectAnalysisLLMService {
   private buildAnalysisContext(
     repoName: string,
     gitStats: GitStats,
-    packageJson?: Record<string, any>,
+    configFiles?: Record<string, string>,
     readmeContent?: string,
     fileStructure?: string[]
   ): string {
@@ -186,26 +186,16 @@ export class ProjectAnalysisLLMService {
       }
     }
 
-    // Package.json analysis
-    if (packageJson) {
-      context += `\n## package.json\n`
-      if (packageJson.name) context += `- Name: ${packageJson.name}\n`
-      if (packageJson.description) context += `- Description: ${packageJson.description}\n`
-      if (packageJson.version) context += `- Version: ${packageJson.version}\n`
-
-      if (packageJson.dependencies) {
-        context += `\n### Dependencies\n`
-        context += `\`\`\`json\n${JSON.stringify(packageJson.dependencies, null, 2)}\n\`\`\`\n`
-      }
-
-      if (packageJson.devDependencies) {
-        context += `\n### Dev Dependencies\n`
-        context += `\`\`\`json\n${JSON.stringify(packageJson.devDependencies, null, 2)}\n\`\`\`\n`
-      }
-
-      if (packageJson.scripts) {
-        context += `\n### Scripts\n`
-        context += `\`\`\`json\n${JSON.stringify(packageJson.scripts, null, 2)}\n\`\`\`\n`
+    // Config files (raw content - AI will detect project type)
+    if (configFiles && Object.keys(configFiles).length > 0) {
+      context += `\n## Config Files\n`
+      for (const [filename, content] of Object.entries(configFiles)) {
+        // Truncate long files
+        const maxLen = 1500
+        const truncated = content.length > maxLen 
+          ? content.substring(0, maxLen) + '\n[... truncated ...]'
+          : content
+        context += `\n### ${filename}\n\`\`\`\n${truncated}\n\`\`\`\n`
       }
     }
 

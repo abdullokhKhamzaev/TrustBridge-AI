@@ -254,13 +254,14 @@ export async function fetchReadme(
 }
 
 /**
- * Fetch package.json content
+ * Fetch any available config files from repository root
+ * Returns raw content - AI will analyze and detect project type
  */
-export async function fetchPackageJson(
+export async function fetchConfigFiles(
   owner: string,
   repo: string,
   token?: string
-): Promise<Record<string, any> | null> {
+): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github.v3.raw',
     'User-Agent': 'DevProfile-AI'
@@ -270,21 +271,47 @@ export async function fetchPackageJson(
     headers.Authorization = `Bearer ${token}`
   }
 
-  const response = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contents/package.json`,
-    { headers }
+  // Common config files to look for
+  const configFiles = [
+    'package.json',
+    'composer.json', 
+    'requirements.txt',
+    'Pipfile',
+    'pyproject.toml',
+    'Cargo.toml',
+    'go.mod',
+    'pom.xml',
+    'build.gradle',
+    'Gemfile',
+    'Makefile',
+    'Dockerfile',
+    '.env.example'
+  ]
+
+  const configs: Record<string, string> = {}
+
+  // Fetch configs in parallel (don't wait for each)
+  const results = await Promise.allSettled(
+    configFiles.map(async (file) => {
+      const response = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/contents/${file}`,
+        { headers }
+      )
+      if (response.ok) {
+        const content = await response.text()
+        return { file, content }
+      }
+      return null
+    })
   )
 
-  if (!response.ok) {
-    return null
+  for (const result of results) {
+    if (result.status === 'fulfilled' && result.value) {
+      configs[result.value.file] = result.value.content
+    }
   }
 
-  try {
-    const content = await response.text()
-    return JSON.parse(content)
-  } catch {
-    return null
-  }
+  return configs
 }
 
 /**
@@ -321,18 +348,51 @@ export async function fetchFileTree(
   const data = await response.json()
   const files: string[] = []
 
-  // Filter to important file types
+  // Filter to important file types (supports multiple languages)
   const importantExtensions = [
+    // JavaScript/TypeScript
     '.ts', '.tsx', '.js', '.jsx', '.vue', '.svelte',
-    '.py', '.go', '.rs', '.java', '.kt',
-    '.json', '.yaml', '.yml', '.toml',
+    // Python
+    '.py',
+    // Go
+    '.go',
+    // Rust
+    '.rs',
+    // Java/Kotlin
+    '.java', '.kt', '.kts',
+    // PHP
+    '.php',
+    // C#/.NET
+    '.cs', '.cshtml', '.razor',
+    // Ruby
+    '.rb', '.erb',
+    // Swift/Objective-C
+    '.swift', '.m', '.h',
+    // C/C++
+    '.c', '.cpp', '.cc', '.hpp',
+    // Dart/Flutter
+    '.dart',
+    // Elixir/Erlang
+    '.ex', '.exs', '.erl',
+    // Config files
+    '.json', '.yaml', '.yml', '.toml', '.xml',
+    // Docs
     '.md', '.mdx'
+  ]
+
+  // Directories to exclude (dependencies, build artifacts)
+  const excludeDirs = [
+    'node_modules', 'vendor', '.git', 'dist', 'build', 
+    '__pycache__', '.venv', 'venv', 'env',
+    'target', 'bin/Debug', 'bin/Release', 'obj',
+    '.next', '.nuxt', '.output'
   ]
 
   for (const item of data.tree || []) {
     if (item.type === 'blob') {
       const hasImportantExt = importantExtensions.some(ext => item.path.endsWith(ext))
-      if (hasImportantExt && !item.path.includes('node_modules')) {
+      const isExcluded = excludeDirs.some(dir => item.path.includes(`/${dir}/`) || item.path.startsWith(`${dir}/`))
+      if (hasImportantExt && !isExcluded) {
         files.push(item.path)
       }
     }
@@ -409,7 +469,7 @@ export async function fetchRepositoryData(
   token?: string
 ): Promise<{
   gitStats: GitStats
-  packageJson: Record<string, any> | null
+  configFiles: Record<string, string>
   readme: string | null
   fileStructure: string[]
   repoName: string
@@ -424,16 +484,16 @@ export async function fetchRepositoryData(
   console.log(`📥 Fetching repository data: ${owner}/${repo}`)
 
   // Fetch all data in parallel
-  const [gitStats, packageJson, readme, fileStructure] = await Promise.all([
+  const [gitStats, configFiles, readme, fileStructure] = await Promise.all([
     calculateGitStats(owner, repo, username, token),
-    fetchPackageJson(owner, repo, token),
+    fetchConfigFiles(owner, repo, token),
     fetchReadme(owner, repo, token),
     fetchFileTree(owner, repo, token)
   ])
 
   return {
     gitStats,
-    packageJson,
+    configFiles,
     readme,
     fileStructure,
     repoName: repo
