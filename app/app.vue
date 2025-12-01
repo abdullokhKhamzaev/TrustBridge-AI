@@ -1,25 +1,45 @@
 <script setup lang="ts">
+const runtimeConfig = useRuntimeConfig()
+const siteUrl = runtimeConfig.public.siteUrl || 'https://trustbridge.dev'
+
 useHead({
   meta: [
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { name: 'theme-color', content: '#06b6d4' },
+    { name: 'author', content: 'Trust Bridge' },
+    { name: 'robots', content: 'index, follow' }
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' }
+    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+    { rel: 'apple-touch-icon', href: '/apple-touch-icon.svg' },
+    { rel: 'canonical', href: siteUrl }
   ],
   htmlAttrs: {
     lang: 'en'
   }
 })
 
-const title = 'Trust Bridge'
-const description = 'Build connections based on verified skills, not self-reported claims. AI-powered credential verification for professionals and companies.'
+const title = 'Trust Bridge - AI-Powered Credential Verification'
+const description = 'Build connections based on verified skills, not self-reported claims. AI-powered credential verification for professionals and companies. Find talent or showcase your real abilities.'
+const ogImage = `${siteUrl}/og-image.svg`
 
 useSeoMeta({
   title,
   description,
+  keywords: 'credential verification, AI skills verification, developer portfolio, hiring platform, verified skills, trust-based hiring, professional profiles',
+  ogType: 'website',
+  ogUrl: siteUrl,
   ogTitle: title,
   ogDescription: description,
-  twitterCard: 'summary_large_image'
+  ogImage,
+  ogSiteName: 'Trust Bridge',
+  ogLocale: 'en_US',
+  twitterCard: 'summary_large_image',
+  twitterTitle: title,
+  twitterDescription: description,
+  twitterImage: ogImage,
+  twitterSite: '@trustbridge'
 })
 
 // Auth state

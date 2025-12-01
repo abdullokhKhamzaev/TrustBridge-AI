@@ -231,7 +231,7 @@ const steps = [
                 <UIcon name="i-lucide-arrow-right" class="w-5 h-5 ml-2" />
               </UButton>
               <UButton to="/about" size="xl" variant="outline">
-                Learn More
+                About Trust Bridge
               </UButton>
             </div>
           </div>
