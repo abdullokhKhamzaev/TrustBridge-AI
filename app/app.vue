@@ -11,8 +11,8 @@ useHead({
   }
 })
 
-const title = 'DevProfile AI'
-const description = 'AI-Powered Developer Portfolio & Matching Platform. Showcase your real skills through AI-powered GitHub repository analysis.'
+const title = 'Trust Bridge'
+const description = 'Build connections based on verified skills, not self-reported claims. AI-powered credential verification for professionals and companies.'
 
 useSeoMeta({
   title,
@@ -52,8 +52,8 @@ const authNavLinks = [
       <div class="container mx-auto px-4 h-16 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-2">
-          <UIcon name="i-lucide-code-2" class="w-8 h-8 text-primary" />
-          <span class="font-bold text-xl">DevProfile AI</span>
+          <UIcon name="i-lucide-shield-check" class="w-8 h-8 text-primary" />
+          <span class="font-bold text-xl">Trust Bridge</span>
         </NuxtLink>
 
         <!-- Navigation -->
@@ -128,13 +128,13 @@ const authNavLinks = [
     <footer class="border-t border-default py-8">
       <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-code-2" class="w-5 h-5 text-primary" />
-          <span class="font-semibold">DevProfile AI</span>
+          <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-primary" />
+          <span class="font-semibold">Trust Bridge</span>
           <span class="text-sm text-muted">• © {{ new Date().getFullYear() }}</span>
         </div>
         <div class="flex items-center gap-4">
           <UButton
-            to="https://github.com"
+            to="https://github.com/AbdullokhKhamzaev"
             target="_blank"
             icon="i-simple-icons-github"
             aria-label="GitHub"

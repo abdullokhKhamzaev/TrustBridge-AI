@@ -35,7 +35,7 @@ watch(viewMode, async (newView) => {
 })
 
 useSeoMeta({
-  title: () => data.value?.data?.profile?.full_name 
+  title: () => data.value?.data?.profile?.full_name
     ? `${data.value.data.profile.full_name} - DevProfile AI`
     : 'Developer Profile - DevProfile AI',
   description: () => data.value?.data?.hr_view?.professional_summary || 'Developer portfolio powered by AI'
@@ -116,14 +116,14 @@ function formatDuration(days: number): string {
     </div>
 
     <!-- Profile Content -->
-    <div v-else class="container mx-auto py-8 px-4 max-w-5xl">
+    <div v-else class="container mx-auto py-8 px-4">
       <!-- Header -->
       <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 mb-6">
         <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
           <!-- Avatar -->
-          <img 
+          <img
             v-if="data.data.profile.avatar_url"
-            :src="data.data.profile.avatar_url" 
+            :src="data.data.profile.avatar_url"
             :alt="data.data.profile.full_name"
             class="w-24 h-24 rounded-full border-4 border-primary/20"
           />
@@ -159,8 +159,8 @@ function formatDuration(days: number): string {
               @click="viewMode = 'hr'"
               :class="[
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                viewMode === 'hr' 
-                  ? 'bg-white dark:bg-gray-700 shadow text-primary' 
+                viewMode === 'hr'
+                  ? 'bg-white dark:bg-gray-700 shadow text-primary'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-400'
               ]"
             >
@@ -171,8 +171,8 @@ function formatDuration(days: number): string {
               @click="viewMode = 'tech'"
               :class="[
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                viewMode === 'tech' 
-                  ? 'bg-white dark:bg-gray-700 shadow text-primary' 
+                viewMode === 'tech'
+                  ? 'bg-white dark:bg-gray-700 shadow text-primary'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-400'
               ]"
             >
@@ -183,8 +183,8 @@ function formatDuration(days: number): string {
               @click="viewMode = 'full'"
               :class="[
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                viewMode === 'full' 
-                  ? 'bg-white dark:bg-gray-700 shadow text-primary' 
+                viewMode === 'full'
+                  ? 'bg-white dark:bg-gray-700 shadow text-primary'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-400'
               ]"
             >
@@ -243,8 +243,8 @@ function formatDuration(days: number): string {
                 Key Strengths
               </h2>
               <div class="flex flex-wrap gap-2">
-                <UBadge 
-                  v-for="skill in data.data.hr_view.soft_skills" 
+                <UBadge
+                  v-for="skill in data.data.hr_view.soft_skills"
                   :key="skill"
                   color="primary"
                   variant="subtle"
@@ -277,7 +277,7 @@ function formatDuration(days: number): string {
                 <UIcon name="i-lucide-code-2" class="w-5 h-5 text-blue-500" />
                 Technical Skills
               </h2>
-              
+
               <div class="space-y-4">
                 <!-- Languages -->
                 <div v-if="data.data.tech_view?.languages?.length">
@@ -336,9 +336,9 @@ function formatDuration(days: number): string {
                     <UIcon :name="getCategoryIcon(category)" class="w-4 h-4" />
                     {{ getCategoryLabel(category) }} ({{ achievements.length }})
                   </h3>
-                  
-                  <div 
-                    v-for="(achievement, idx) in getVisibleAchievements(achievements, category as string)" 
+
+                  <div
+                    v-for="(achievement, idx) in getVisibleAchievements(achievements, category as string)"
                     :key="idx"
                     class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                   >
@@ -366,10 +366,10 @@ function formatDuration(days: number): string {
                       </UBadge>
                     </div>
                   </div>
-                  
+
                   <!-- Show more / Show less -->
-                  <button 
-                    v-if="achievements.length > 5" 
+                  <button
+                    v-if="achievements.length > 5"
                     @click="toggleCategory(category as string)"
                     class="text-sm text-primary hover:underline flex items-center gap-1"
                   >
@@ -396,10 +396,10 @@ function formatDuration(days: number): string {
               <UIcon name="i-lucide-folder-open" class="w-5 h-5 text-blue-500" />
               Projects
             </h2>
-            
+
             <div class="space-y-3">
-              <div 
-                v-for="project in data.data.projects" 
+              <div
+                v-for="project in data.data.projects"
                 :key="project.name"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
               >
@@ -424,7 +424,7 @@ function formatDuration(days: number): string {
           </div>
 
           <!-- Interview Topics (Tech view) -->
-          <div 
+          <div
             v-if="(viewMode === 'tech' || viewMode === 'full') && data.data.tech_view?.interview_topics?.length"
             class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
           >
@@ -432,10 +432,10 @@ function formatDuration(days: number): string {
               <UIcon name="i-lucide-message-circle" class="w-5 h-5 text-purple-500" />
               Interview Topics
             </h2>
-            
+
             <ul class="space-y-2 text-sm">
-              <li 
-                v-for="(topic, idx) in data.data.tech_view.interview_topics.slice(0, 10)" 
+              <li
+                v-for="(topic, idx) in data.data.tech_view.interview_topics.slice(0, 10)"
                 :key="idx"
                 class="flex items-start gap-2"
               >
@@ -446,7 +446,7 @@ function formatDuration(days: number): string {
           </div>
 
           <!-- Best Practices (Tech view) -->
-          <div 
+          <div
             v-if="(viewMode === 'tech' || viewMode === 'full') && data.data.tech_view?.best_practices?.length"
             class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
           >
@@ -454,10 +454,10 @@ function formatDuration(days: number): string {
               <UIcon name="i-lucide-check-square" class="w-5 h-5 text-green-500" />
               Best Practices
             </h2>
-            
+
             <ul class="space-y-2 text-sm">
-              <li 
-                v-for="practice in data.data.tech_view.best_practices" 
+              <li
+                v-for="practice in data.data.tech_view.best_practices"
                 :key="practice"
                 class="flex items-start gap-2"
               >
@@ -471,7 +471,7 @@ function formatDuration(days: number): string {
 
       <!-- Footer -->
       <div class="mt-8 text-center text-sm text-gray-400">
-        <p>Profile powered by <NuxtLink to="/" class="text-primary hover:underline">DevProfile AI</NuxtLink></p>
+        <p>Profile powered by <NuxtLink to="/" class="text-primary hover:underline">Trust Bridge</NuxtLink></p>
       </div>
     </div>
   </div>
